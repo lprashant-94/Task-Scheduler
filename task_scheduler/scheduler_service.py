@@ -27,13 +27,13 @@ class SchedulerService:
         self.stop = False
         self.threads = []
         for i in range(size):
-            t = Thread(name="Scheduler Thread #%d" % i, target=self.thread_function)
+            t = Thread(name="Scheduler Thread #%d" % i, target=self.__run_task)
             self.threads.append(t)
             t.start()
-        l = Thread(name="Looper", target=self.update_ready_to_run)
+        l = Thread(name="Looper", target=self.__update_ready_to_run)
         l.start()
 
-    def update_ready_to_run(self):
+    def __update_ready_to_run(self):
         while not self.stop:
             logger.debug("Looper: queue = %s" % self.queue)
             try:
@@ -52,7 +52,7 @@ class SchedulerService:
         self.ready_to_run.join()
         self.stop = True
 
-    def thread_function(self):
+    def __run_task(self):
         while not self.stop:
             try:
                 task = self.ready_to_run.get(block=True, timeout=1)
